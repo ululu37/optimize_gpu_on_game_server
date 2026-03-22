@@ -2,6 +2,11 @@
 
 ระบบ Game Server ประสิทธิภาพสูง พัฒนาด้วยภาษา Rust ที่ออกแบบมาเพื่อรองรับผู้เล่นพร้อมกันได้สูงสุดถึง **1,500,000 Player** ที่ความเร็วคงที่ **30 Ticks Per Second (TPS)** โดยเน้นการประมวลผลบน GPU ทั้งหมดเพื่อหาตำแหน่งและการมองเห็นของผู้เล่น (Spatial Partitioning & Neighbor Discovery)
 
+## 💻 ฮาร์ดแวร์ที่ใช้ทดสอบ (Tested Hardware)
+- **CPU**: Intel Core Ultra 7 255H (16 Core / 22 Threads)
+- **RAM**: DDR5 16 GB (Unified Memory Architecture)
+- **GPU**: Intel Arc Graphics (Integrated)
+
 ## 📊 ผลการทดสอบการเพิ่มประสิทธิภาพ (Optimization Journey)
 
 | วิธีการ (Methodology) | ความจุ (Players) | การใช้งาน GPU | ความเสถียร / ข้อจำกัด (Bottlenecks) |
@@ -39,21 +44,29 @@ graph TD
 ### 3. โครงสร้าง Grid แบบ Link List
 เลือกใช้โครงสร้างข้อมูลแบบ Linked List ภายใน GPU เพื่อประหยัดพื้นที่และรักษาตำแหน่งของข้อมูล (Memory Locality) ให้ข้อมูลที่อยู่ใกล้กันในเกม อยู่ใกล้กันในหน่วยความจำ
 
-## 🚀 วิธีการรันโปรเจค
+## 🚀 วิธีการรันโปรเจค (How to Run)
 
-### ความต้องการของระบบ
-- **Rust Compiler** (แนะนำรุ่นล่าสุด)
-- **GPU ที่รองรับ WGPU** (Vulkan, DX12 หรือ Metal)
+โปรเจคประกอบด้วย 2 ส่วนหลัก คือตัว **Server (GPU Engine)** และ **Viewer (Client Visualization)**
 
-### ฝั่ง Server
+### 1. การรัน GPU Server (ตัวหลักในการคำนวณ)
+ใช้คำสั่งนี้เพื่อเริ่มการประมวลผลตำแหน่งผู้เล่น 1,000,000+ คน บน GPU:
 ```bash
 cargo run --bin gpu
 ```
+*ระบบจะแสดงผล TPS (Ticks Per Second) และ Avg Work(ms) ในหน้า Terminal*
 
-### ฝั่ง Viewer (Client Simulator)
+### 2. การรัน Viewer (ดูภาพจำลอง)
+รันคำสั่งนี้เพื่อเปิดหน้าต่างดูตำแหน่งการเคลื่อนที่ของผู้เล่นแบบ Real-time:
 ```bash
 cargo run --bin viewer
 ```
+*ตัว Viewer จะรับข้อมูลผ่าน UDP ที่ส่งมาจาก GPU Server*
+
+---
+### 🛠️ ความต้องการพื้นฐาน (Requirements)
+- **Rust**: ดาวน์โหลดที่ [rustup.rs](https://rustup.rs/)
+- **GPU Drivers**: รองรับ Vulkan, DX12 หรือ Metal (มีมาให้ในชิป Intel Core Ultra 7)
+- **Networking**: ตัว Server จะเปิด Binding ที่ `127.0.0.1:0` และส่งข้อมูลไปที่ `9000` (Viewer ปลายนิ้ว)
 
 ---
 *โปรเจคนี้เป็นการวิจัยเชิงลึกเรื่องโครงสร้างพื้นฐานสำหรับเกมออนไลน์ขนาดหยักษ์ (Massive Scale) รับรองความเสถียรที่ 1.2M คน และ Peak ได้สูงสุด 1.5M คน ที่ 30 TPS*
