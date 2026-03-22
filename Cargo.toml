@@ -1,0 +1,13 @@
+[package]
+name = "testudp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rayon = "1.8" # สำหรับรัน Multi-thread แบบง่ายและทรงพลัง
+rand = "0.8"  # สำหรับสุ่มตำแหน่ง
+plotters = "0.3.7"
+wgpu = "0.19.0"
+pollster = "0.3.0"
+bytemuck = { version = "1.25.0", features = ["derive", "min_const_generics"] }
+winit = "0.29"
